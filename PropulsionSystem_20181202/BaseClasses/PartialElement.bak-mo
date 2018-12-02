@@ -1,0 +1,47 @@
+within PropulsionSystem.BaseClasses;
+
+partial model PartialElement
+  import Modelica.Constants;
+  
+  /********************************************************
+    Declaration
+  ********************************************************/
+  //********** Package **********
+  replaceable package Medium= Modelica.Media.Interfaces.PartialMedium
+    annotation (choicesAllMatching= true);
+  
+  
+  //********** Parameters **********
+  //##### none #####
+  
+  //********** Internal variables **********
+  //##### none #####
+  
+  //********** Interfaces **********
+  //##### none #####
+  
+  //********** Initialization **********
+  //##### none #####
+  
+//********** Protected objects **********
+//##### none #####
+
+/********************************************************
+  Model coding
+********************************************************/
+equation
+  //********** Geometries **********
+  //##### none #####
+  
+  //********** Connections, interface <-> internal variables **********
+  //##### none #####
+  
+  //********** Eqns describing physics **********
+  //##### none #####
+  
+/********************************************************
+  Graphics
+********************************************************/
+//##### none #####
+  
+end PartialElement;

@@ -1,0 +1,9 @@
+within PropulsionSystem.BaseClasses;
+
+partial model PartialSubelement
+  
+  annotation(
+    Diagram,
+    Icon(graphics = {Rectangle(pattern = LinePattern.Dash, lineThickness = 1, extent = {{-80, 60}, {80, -60}}), Text(origin = {-3, -81}, extent = {{-39, 15}, {39, -15}}, textString = "%name")}));
+  
+end PartialSubelement;

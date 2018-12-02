@@ -1,0 +1,102 @@
+within PropulsionSystem.BaseClasses;
+
+partial model PartialElementTwoPorts
+  import Modelica.Constants;
+  
+  /********************************************************
+    Declaration
+  ********************************************************/
+  //********** Package **********
+  replaceable package Medium= Modelica.Media.Interfaces.PartialMedium
+    annotation (choicesAllMatching= true);
+  
+  
+  //********** Parameters **********
+  parameter Boolean allowFlowReversal= true
+    "= true to allow flow reversal, false restricts to design direction (port_a -> port_b)"
+    annotation(Dialog(tab="Assumptions"), Evaluate=true);
+    
+  parameter Modelica.SIunits.Area Amech_I= 1.0 
+    annotation(Dialog(group = "Geometry"));
+  
+  parameter Modelica.SIunits.Area Amech_O= 1.0
+    annotation(Dialog(group = "Geometry"));
+  
+  
+  //********** Internal variables **********
+  inner Medium.BaseProperties fluid_I "flow station of inlet";
+  inner Medium.BaseProperties fluid_O "flow station of outlet";
+  
+  
+  //********** Interfaces **********
+  Modelica.Fluid.Interfaces.FluidPort_a port_a
+  (
+    redeclare package Medium = Medium,
+    m_flow(min=if allowFlowReversal then -Constants.inf else 0.0
+          , start= m_flow_start)
+  ) 
+    annotation(
+    Placement(visible = true, transformation(origin = {-100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {-100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  
+  Modelica.Fluid.Interfaces.FluidPort_b port_b
+  (
+    redeclare package Medium = Medium,
+    m_flow(max=if allowFlowReversal then +Constants.inf else 0.0
+           )
+  ) 
+    annotation(
+    Placement(visible = true, transformation(origin = {100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  
+  
+  //********** Initialization **********
+  parameter Medium.AbsolutePressure p_a_start= 101.3*1000
+    "Start value of pressure at port a"
+    annotation(Dialog(tab = "Initialization"));
+  parameter Medium.AbsolutePressure p_b_start= 101.3*1000*0.99
+    "Start value of pressure at port b"
+    annotation(Dialog(tab = "Initialization"));
+  parameter Medium.MassFlowRate m_flow_start = 10.0
+    "Start value for mass flow rate"
+     annotation(Evaluate=true, Dialog(tab = "Initialization"));
+  
+  
+//********** Protected objects **********
+protected
+  parameter Boolean port_a_exposesState = false
+    "= true if port_a exposes the state of a fluid volume";
+  parameter Boolean port_b_exposesState = false
+    "= true if port_b.p exposes the state of a fluid volume";
+  parameter Boolean showDesignFlowDirection = false
+    "= false to hide the arrow in the model icon"; 
+
+
+/********************************************************
+  Model coding
+********************************************************/
+equation
+  //********** Geometries **********
+  
+  
+  //********** Connections, interface <-> internal variables **********
+  //-- inlet --
+  fluid_I.p= port_a.p;
+  port_a.h_outflow= fluid_I.h;
+  fluid_I.h= inStream(port_a.h_outflow);
+  fluid_I.Xi= inStream(port_a.Xi_outflow);
+  
+  //-- outlet --
+  port_b.p= fluid_O.p;
+  port_b.h_outflow= fluid_O.h;
+  fluid_O.Xi= inStream(port_b.Xi_outflow);
+  
+  
+  //********** Eqns describing physics **********
+  //##### none #####
+  
+  
+/********************************************************
+  Graphics
+********************************************************/
+//##### none #####
+  
+end PartialElementTwoPorts;

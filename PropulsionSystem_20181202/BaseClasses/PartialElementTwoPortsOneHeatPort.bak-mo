@@ -1,0 +1,117 @@
+within PropulsionSystem.BaseClasses;
+
+model PartialElementTwoPortsOneHeatPort
+  import Modelica.Constants;
+  
+  /********************************************************
+    Declaration
+  ********************************************************/
+  //********** Package **********
+  replaceable package Medium= Modelica.Media.Interfaces.PartialMedium
+    annotation (choicesAllMatching= true);
+  
+  
+  //********** Parameters **********
+  parameter Boolean allowFlowReversal= true
+    "= true to allow flow reversal, false restricts to design direction (port_a -> port_b)"
+    annotation(Dialog(tab="Assumptions"), Evaluate=true);
+    
+  parameter Modelica.SIunits.Area Amech_I= 1.0 
+    annotation(Dialog(group = "Geometry"));
+  
+  parameter Modelica.SIunits.Area Amech_O= 1.0
+    annotation(Dialog(group = "Geometry"));
+  
+  
+  //********** Internal variables **********
+  Medium.BaseProperties fluid_I "flow station of inlet with isentropic compression";
+  Medium.BaseProperties fluid_O "flow station of outlet with isentropic compression";
+  
+  Modelica.SIunits.Area A_I(start= Amech_I);
+  Modelica.SIunits.Area A_O(start= Amech_O);
+  Modelica.SIunits.Velocity V_I(start= 10);
+  Modelica.SIunits.Velocity V_O(start= 10);
+  
+  
+  //********** Interfaces **********
+  Modelica.Fluid.Interfaces.FluidPort_a port_a
+  (
+    redeclare package Medium = Medium,
+    m_flow(min=if allowFlowReversal then -Constants.inf else 0.0
+          , start= m_flow_start)
+  ) 
+    annotation(
+    Placement(visible = true, transformation(origin = {-100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {-100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  
+  Modelica.Fluid.Interfaces.FluidPort_b port_b
+  (
+    redeclare package Medium = Medium,
+    m_flow(max=if allowFlowReversal then +Constants.inf else 0.0
+           )
+  ) 
+    annotation(
+    Placement(visible = true, transformation(origin = {100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {100, 98}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+  
+  Modelica.Thermal.HeatTransfer.Interfaces.HeatPort_a HeatPort_a 
+    annotation(
+    Placement(visible = true, transformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {0, 100}, extent = {{-10, -10}, {10, 10}}, rotation = 0)));
+
+  
+  //********** Initialization **********
+  parameter Medium.AbsolutePressure p_a_start= 101.3*1000
+    "Start value of pressure at port a"
+    annotation(Dialog(tab = "Initialization"));
+  parameter Medium.AbsolutePressure p_b_start= 101.3*1000*0.99
+    "Start value of pressure at port b"
+    annotation(Dialog(tab = "Initialization"));
+  parameter Medium.MassFlowRate m_flow_start = 10.0
+    "Start value for mass flow rate"
+     annotation(Evaluate=true, Dialog(tab = "Initialization"));
+  
+  
+  //********** Protected objects **********
+protected
+  parameter Boolean port_a_exposesState = false
+    "= true if port_a exposes the state of a fluid volume";
+  parameter Boolean port_b_exposesState = false
+    "= true if port_b.p exposes the state of a fluid volume";
+  parameter Boolean showDesignFlowDirection = false
+    "= false to hide the arrow in the model icon"; 
+
+
+/********************************************************
+  Model coding
+********************************************************/
+equation
+  //********** Geometries **********
+  A_I= Amech_I;
+  A_O= Amech_O;
+  
+  
+  //********** Connections, interface <-> internal variables **********
+  //-- inlet --
+  fluid_I.p= port_a.p;
+  port_a.h_outflow= fluid_I.h;
+  fluid_I.h= inStream(port_a.h_outflow);
+  fluid_I.Xi= inStream(port_a.Xi_outflow);
+  V_I= abs(port_a.m_flow)/(fluid_I.d*A_I);
+  
+  //-- outlet --
+  port_b.p= fluid_O.p;
+  port_b.h_outflow= fluid_O.h;
+  fluid_O.Xi= inStream(port_b.Xi_outflow);
+  V_O= abs(port_b.m_flow)/(fluid_I.d*A_O);
+  
+  
+  //********** Eqns describing physics **********
+  //-- wall temperature --
+  HeatPort_a.T = fluid_O.T;
+  
+  
+/********************************************************
+  Graphics
+********************************************************/
+//##### none #####
+  
+  
+end PartialElementTwoPortsOneHeatPort;
