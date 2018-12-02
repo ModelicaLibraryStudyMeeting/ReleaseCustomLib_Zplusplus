@@ -1,0 +1,52 @@
+within PropulsionSystem.Elements;
+
+model HeatInjector
+  extends PropulsionSystem.BaseClasses.PartialElementTwoPortsOneHeatPort;
+  import Modelica.Constants;
+  
+  /********************************************************
+     Declaration
+  ********************************************************/
+  //********** Package **********
+  //##### none #####
+  //********** Parameters **********
+  //##### none #####
+  //********** Internal variables **********
+  //##### none #####
+  //********** Interfaces **********
+  //##### none #####
+  //********** Initialization **********
+  //##### none #####
+  //********** Protected objects **********
+
+//##### none #####
+  /********************************************************
+    Model coding
+  ********************************************************/
+
+equation
+//********** Geometries **********
+//##### none #####
+//********** Connections, interface <-> internal variables **********
+//##### none #####
+//********** Eqns describing physics **********
+  fluid_O.p = fluid_I.p;
+// no pressure drop
+//-- mass conservation --
+  port_a.m_flow + port_b.m_flow = 0;
+  fluid_O.Xi= fluid_I.Xi;
+//-- energy conservation --
+  port_a.m_flow * fluid_I.h + HeatPort_a.Q_flow + port_b.m_flow * fluid_O.h = 0;
+  
+  
+/********************************************************
+  Graphics
+********************************************************/
+//##### none #####
+
+annotation(
+    Icon(graphics = {Polygon(origin = {-31, 12}, fillColor = {255, 0, 0}, fillPattern = FillPattern.Solid, points = {{111, 30}, {47, 30}, {-7, 26}, {-35, 20}, {-47, 8}, {-49, -12}, {-45, -32}, {-35, -42}, {-1, -48}, {47, -50}, {111, -50}, {111, 30}}), Rectangle(origin = {-76, 69}, fillColor = {118, 118, 118}, fillPattern = FillPattern.Solid, extent = {{-2, 31}, {2, -49}}), Rectangle(origin = {78, 69}, fillColor = {93, 93, 93}, fillPattern = FillPattern.Solid, extent = {{-2, 31}, {2, -27}}), Rectangle(origin = {105, 98}, rotation = -90, fillColor = {68, 68, 68}, fillPattern = FillPattern.Solid, extent = {{-2, -5}, {2, -29}}), Text(origin = {19, -75}, extent = {{-63, 11}, {25, -11}}, textString = "%name"), Rectangle(origin = {-51, 99}, rotation = -90, fillColor = {118, 118, 118}, fillPattern = FillPattern.Solid, extent = {{-2, -23}, {2, -49}}), Line(origin = {-0.320122, 73.7199}, points = {{0, 17}, {0, -61}}, thickness = 2, arrow = {Arrow.None, Arrow.Open}, arrowSize = 10), Text(origin = {0, -6}, extent = {{-12, 10}, {12, -10}}, textString = "dq")}, coordinateSystem(initialScale = 0.1)));
+
+
+  
+end HeatInjector;

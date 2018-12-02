@@ -1,0 +1,133 @@
+within PropulsionSystem.Elements;
+
+model Turbine
+  extends PropulsionSystem.BaseClasses.PartialElementTwoPortsTwoShafts;
+  import Modelica.Constants;
+  
+  /********************************************************
+   Declaration
+  ********************************************************/
+  //********** Package **********
+  //##### none #####
+  //********** Parameters **********
+  parameter Boolean use_Wp_in=false
+    "" annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  parameter Boolean use_eff_in=false
+    "" annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  parameter Boolean use_PRdes=false
+    "" annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  
+  parameter Modelica.SIunits.MassFlowRate WpDes= 1.0 
+    ""
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  parameter Real effDes= 0.80 
+    ""
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  
+  parameter Real PRdes= 5.0
+    ""
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  parameter Modelica.SIunits.Pressure pDes= 45.0*101.315*1000
+    ""
+    annotation(
+    Dialog(group = "Initial value"));
+  
+  parameter Modelica.SIunits.Temperature Tdes= 2000.0
+    ""
+    annotation(
+    Dialog(group = "Initial value"));
+  //********** Internal variables **********
+  Modelica.SIunits.MassFlowRate Wp(start= WpDes) "corrected mass flow rate";
+  Modelica.SIunits.MassFlowRate WpChara(start= WpDes);
+  Real PR(start = PRdes) "pressure ratio";
+  Real eff(start = effDes) "adiabatic efficiency";
+  Modelica.SIunits.SpecificEnthalpy dht_is "specific enthalpy change in isentropic compression";
+  Modelica.SIunits.SpecificEnthalpy dht "specific enthalpy change in non-isentropic compression";
+  Modelica.SIunits.SpecificEnthalpy h_Ois "";
+  //********** Interfaces **********
+  //##### none #####
+  Modelica.Blocks.Interfaces.RealInput Wp_in if use_Wp_in
+    ""
+    annotation(
+    Placement(visible = true, transformation(origin = {-80, -112}, extent = {{-12, -12}, {12, 12}}, rotation = 90), iconTransformation(origin = {-8.88178e-16, -58}, extent = {{-8, -8}, {8, 8}}, rotation = 90)));
+  
+  
+  Modelica.Blocks.Interfaces.RealInput eff_in if use_eff_in
+    ""
+    annotation(
+    Placement(visible = true, transformation(origin = {-60, -112}, extent = {{-12, -12}, {12, 12}}, rotation = 90), iconTransformation(origin = {40, -78}, extent = {{-8, -8}, {8, 8}}, rotation = 90)));
+  //********** Initialization **********
+
+//##### none #####
+  //********** Protected objects **********
+
+//##### none #####
+  /********************************************************
+  Model coding
+********************************************************/
+equation
+//********** Geometries **********
+//##### none #####
+//********** Connections, interface <-> internal variables **********
+  if use_Wp_in == true then
+    WpChara = Wp_in;
+  else
+//WpChara= WpDes;
+  end if;
+  
+  if (use_eff_in==true) then
+    eff= eff_in;
+  else
+    eff= effDes;
+  end if;
+  
+  if (use_PRdes==true) then
+    PR= PRdes;
+  end if;
+//********** Eqns describing physics **********
+  Wp = port_a.m_flow * sqrt(fluid_I.T / Tdes) / (fluid_I.p / pDes);
+  Wp= WpChara;
+//-- enthalpy & entropy --
+  h_Ois = Medium.isentropicEnthalpy(fluid_O.p, fluid_I.state);
+  dht_is = h_Ois - fluid_I.h;
+  eff = dht /dht_is ;
+  dht = fluid_O.h - fluid_I.h;
+//-- pressure --
+  PR = fluid_I.p / fluid_O.p;
+//-- mass conservation --
+  port_a.m_flow + port_b.m_flow = 0;
+  fluid_O.Xi= fluid_I.Xi;
+//-- energy conservation --
+  trq = flange_a.tau + flange_b.tau;
+  pwr = (port_a.m_flow * fluid_I.h) + (port_b.m_flow * fluid_O.h);
+  der(phi) = omega;
+  omega*trq = pwr;
+  Nmech = Modelica.SIunits.Conversions.NonSIunits.to_rpm(omega);
+  
+  
+/********************************************************
+  Graphics
+********************************************************/
+
+  annotation(
+    Icon(graphics = {Polygon(origin = {30, 0}, fillColor = {255, 157, 0}, fillPattern = FillPattern.Solid, points = {{-90, 0}, {-90, -20}, {30, -80}, {30, 80}, {-90, 20}, {-90, 0}}), Rectangle(origin = {84, 6}, fillPattern = FillPattern.Solid, extent = {{-24, 4}, {16, -16}}), Rectangle(origin = {-86, 6}, fillPattern = FillPattern.Solid, extent = {{-12, 4}, {26, -16}}), Text(origin = {0, 6}, lineColor = {255, 255, 255}, extent = {{-20, 10}, {28, -18}}, textString = "Trb"), Text(origin = {-63, -93}, extent = {{-37, 15}, {71, -7}}, textString = "%name"), Rectangle(origin = {-57, 30}, fillColor = {165, 165, 165}, fillPattern = FillPattern.Solid, extent = {{-3, 66}, {1, -10}}), Rectangle(origin = {57, 86}, fillColor = {165, 165, 165}, fillPattern = FillPattern.Solid, extent = {{-1, 12}, {3, -8}}), Rectangle(origin = {-99, 34}, fillColor = {165, 165, 165}, fillPattern = FillPattern.Solid, extent = {{-3, 66}, {43, 62}}), Rectangle(origin = {59, 34}, fillColor = {165, 165, 165}, fillPattern = FillPattern.Solid, extent = {{-3, 66}, {43, 62}})}, coordinateSystem(initialScale = 0.1)));
+
+end Turbine;

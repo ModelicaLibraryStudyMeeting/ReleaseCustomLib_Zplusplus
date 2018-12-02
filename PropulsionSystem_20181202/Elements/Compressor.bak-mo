@@ -1,0 +1,146 @@
+within PropulsionSystem.Elements;
+
+model Compressor
+  extends PropulsionSystem.BaseClasses.PartialElementTwoPortsTwoShafts;
+  import Modelica.Constants;
+  
+  /********************************************************
+    Declaration
+  ********************************************************/
+  //********** Package **********
+  //##### none #####
+  //********** Parameters **********
+  parameter Boolean use_PR_in=false
+    "" annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+    
+  parameter Boolean use_Wc_in=false
+    "" annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  parameter Boolean use_eff_in=false
+    "" annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  parameter Boolean use_WcDes=false
+    "" annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  
+  parameter Modelica.SIunits.MassFlowRate WcDes=1.0
+    ""
+    annotation(
+    Dialog(group = "Characteristics"));
+
+  
+  parameter Real PRdes= 20 
+    "pressure ratio at design point"
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  parameter Real effDes= 0.80 
+    "adiabatic efficiency at design point"
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  parameter Modelica.SIunits.Pressure pDes= 101.315*1000
+    ""
+    annotation(
+    Dialog(group = "Initial value"));
+  
+  parameter Modelica.SIunits.Temperature Tdes= 288.15
+    ""
+    annotation(
+    Dialog(group = "Initial value"));
+  //********** Internal variables **********
+  Modelica.SIunits.MassFlowRate Wc(start= WcDes) "corrected mass flow rate";
+  Modelica.SIunits.MassFlowRate WcChara(start= WcDes);
+  Real PR(start = PRdes) "pressure ratio";
+  Real eff(start = effDes) "adiabatic efficiency";
+  Modelica.SIunits.SpecificEnthalpy dht_is "specific enthalpy change in isentropic compression";
+  Modelica.SIunits.SpecificEnthalpy dht "specific enthalpy change in non-isentropic compression";
+  Modelica.SIunits.SpecificEnthalpy h_Ois "";
+  //********** Interfaces **********
+  //##### none #####
+  //********** Initialization **********
+  //##### none #####
+  //********** Protected objects **********
+  //##### none #####
+  /********************************************************
+    Model coding
+  ********************************************************/
+  Modelica.Blocks.Interfaces.RealInput Wc_in if use_Wc_in
+    ""
+    annotation(
+    Placement(visible = true, transformation(origin = {-80, -112}, extent = {{-12, -12}, {12, 12}}, rotation = 90), iconTransformation(origin = {-40, -76}, extent = {{-6, -6}, {6, 6}}, rotation = 90)));
+  
+  Modelica.Blocks.Interfaces.RealInput PR_in if use_PR_in
+    ""
+    annotation(
+    Placement(visible = true, transformation(origin = {-60, -112}, extent = {{-12, -12}, {12, 12}}, rotation = 90), iconTransformation(origin = {0, -56}, extent = {{-6, -6}, {6, 6}}, rotation = 90)));
+  
+  Modelica.Blocks.Interfaces.RealInput eff_in if use_eff_in
+    ""
+    annotation(
+    Placement(visible = true, transformation(origin = {-40, -112}, extent = {{-12, -12}, {12, 12}}, rotation = 90), iconTransformation(origin = {40, -36}, extent = {{-6, -6}, {6, 6}}, rotation = 90)));
+  
+equation
+//********** Geometries **********
+//##### none #####
+//********** Connections, interface <-> internal variables **********
+  if use_WcDes == true then
+    WcChara = WcDes;
+  end if;
+  
+  
+  if (use_Wc_in==true) then
+    WcChara= Wc_in;
+  end if;
+  
+  if (use_PR_in==true) then
+    PR= PR_in;
+  else
+    PR=PRdes;
+  end if;
+  
+  if (use_eff_in==true) then
+    eff= eff_in;
+  else
+    eff= effDes;
+  end if;
+//********** Eqns describing physics **********
+  Wc = port_a.m_flow * sqrt(fluid_I.T / Tdes) / (fluid_I.p / pDes);
+  Wc= WcChara;
+//-- pressure --
+  PR = fluid_O.p / fluid_I.p;
+//-- enthalpy & entropy --
+  h_Ois = Medium.isentropicEnthalpy(fluid_O.p, fluid_I.state);
+  dht_is = h_Ois - fluid_I.h;
+  eff = dht_is / dht;
+  dht = fluid_O.h - fluid_I.h;
+//-- mass conservation --
+  port_a.m_flow + port_b.m_flow = 0;
+  fluid_O.Xi= fluid_I.Xi;
+//-- energy conservation --
+  trq = flange_a.tau + flange_b.tau;
+  pwr = (port_a.m_flow * fluid_I.h) + (port_b.m_flow * fluid_O.h);
+  der(phi) = omega;
+  omega*trq = pwr;
+  Nmech = Modelica.SIunits.Conversions.NonSIunits.to_rpm(omega);
+  
+  
+/********************************************************
+  Graphics
+********************************************************/
+  annotation(
+    Icon(graphics = {Polygon(origin = {2, 36}, fillColor = {0, 85, 255}, fillPattern = FillPattern.Solid, points = {{-62, -38}, {-62, -116}, {58, -56}, {58, -16}, {-62, 44}, {-62, -38}}), Rectangle(origin = {-89, 6}, fillPattern = FillPattern.Solid, extent = {{-11, 4}, {29, -16}}), Rectangle(origin = {83, 2}, fillPattern = FillPattern.Solid, extent = {{-23, 8}, {17, -12}}), Rectangle(origin = {63, 86}, rotation = 180, fillColor = {184, 184, 184}, fillPattern = FillPattern.Solid, extent = {{3, 66}, {7, -14}}), Text(origin = {-13, 3}, lineColor = {255, 255, 255}, fillColor = {255, 255, 255}, fillPattern = FillPattern.Solid, extent = {{-21, 17}, {37, -21}}, textString = "Cmp"), Rectangle(origin = {-94, 95}, rotation = 90, fillColor = {184, 184, 184}, fillPattern = FillPattern.Solid, extent = {{1, 12}, {5, -36}}), Rectangle(origin = {82, 93}, rotation = 90, fillColor = {184, 184, 184}, fillPattern = FillPattern.Solid, extent = {{3, 26}, {7, -18}}),  Text(origin = {10, -81}, extent = {{-22, 5}, {72, -17}}, textString = "%name"), Rectangle(origin = {-53, 86}, rotation = 180, fillColor = {184, 184, 184}, fillPattern = FillPattern.Solid, extent = {{3, 8}, {7, -14}})}, coordinateSystem(initialScale = 0.1)));
+
+end Compressor;

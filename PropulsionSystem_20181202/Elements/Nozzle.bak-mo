@@ -1,0 +1,125 @@
+within PropulsionSystem.Elements;
+
+model Nozzle
+  extends PropulsionSystem.BaseClasses.PartialElementTwoPorts;
+  import Modelica.Constants;
+  /********************************************************
+     Declaration
+  ********************************************************/
+  //********** Package **********
+  //##### none #####
+  //********** Parameters **********
+  parameter Boolean use_CdTh_in = false
+    ""
+    annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  parameter Boolean use_Cv_in = false
+    ""
+    annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  parameter Boolean use_CdThDes = false 
+    ""
+    annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  parameter Boolean use_CvDes = false 
+    ""
+    annotation(
+    Evaluate = true,
+    HideResult = true,
+    choices(checkBox = true));
+  
+  
+  parameter Real CdThDes = 0.99
+    ""
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  parameter Real CvDes = 0.99
+    ""
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  parameter Modelica.SIunits.Area Amech_th= 1.0 
+    annotation(Dialog(group = "Geometry"));
+  //********** Internal variables **********
+  Medium.BaseProperties fluid_OTot "flow station of outlet, total";
+  //Medium.BaseProperties fluid_th "flow station of throat";
+  //Modelica.SIunits.Area A_th(start= Amech_th);
+  Modelica.SIunits.Velocity V_O(start= 10);
+  Modelica.SIunits.Velocity V_Ois(start= 10);
+  //Modelica.SIunits.Velocity V_th(start= 10);
+  Real PR(start=1);
+  Real CdTh(start = CdThDes);
+  Real Cv(start = CvDes);
+  
+  Modelica.SIunits.SpecificEnthalpy h_Ois "";
+  
+  Modelica.SIunits.Force Fg "";
+  //********** Interfaces **********
+  Modelica.Blocks.Interfaces.RealInput CdTh_in if use_CdTh_in "" annotation(
+    Placement(visible = true, transformation(origin = {-80, -111}, extent = {{-11, -11}, {11, 11}}, rotation = 90), iconTransformation(origin = {-70, -84}, extent = {{-8, -8}, {8, 8}}, rotation = 90)));
+  Modelica.Blocks.Interfaces.RealInput Cv_in if use_Cv_in "" annotation(
+    Placement(visible = true, transformation(origin = {-40, -111}, extent = {{-11, -11}, {11, 11}}, rotation = 90), iconTransformation(origin = {-40, -74}, extent = {{-8, -8}, {8, 8}}, rotation = 90)));
+  Modelica.Blocks.Interfaces.RealOutput Fg_out annotation(
+    Placement(visible = true, transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {53, 0}, extent = {{-7, -7}, {7, 7}}, rotation = 0)));
+  // output
+
+//********** Initialization **********
+  //##### none #####
+  //********** Protected objects **********
+  //##### none #####
+  /********************************************************
+        Model coding
+  ********************************************************/
+equation
+//********** Geometries **********
+//##### none #####
+//********** Connections, interface <-> internal variables **********
+  if use_CdTh_in == true then
+    CdTh = CdTh_in;
+  else
+    CdTh = CdThDes;
+  end if;
+  
+  
+  if (use_Cv_in==true) then
+    Cv= Cv_in;
+  else
+    Cv= CvDes;
+  end if;
+  
+  Fg_out= Fg;
+//********** Eqns describing physics **********
+  fluid_OTot.p = fluid_I.p;
+  PR= fluid_I.p / fluid_O.p;
+//-- mass conservation --
+  port_a.m_flow + port_b.m_flow = 0;
+  fluid_O.Xi= fluid_I.Xi;
+//-- energy conservation --
+  fluid_I.h = h_Ois + V_Ois ^ 2.0 / 2.0;
+  h_Ois = Medium.isentropicEnthalpy(fluid_O.p, fluid_I.state);
+  
+  V_O = Cv*V_Ois;
+  fluid_I.h = fluid_O.h + V_O^2.0 / 2.0;
+  
+  (port_a.m_flow*fluid_I.h) + (port_b.m_flow*fluid_OTot.h) = 0;
+//-- performance characteristics --
+  Fg = (-1) * port_b.m_flow * V_O;
+  
+/********************************************************
+  Graphics
+********************************************************/
+
+  annotation(
+    Icon(graphics = {Polygon(origin = {0, 10}, fillColor = {208, 208, 208}, fillPattern = FillPattern.Solid, points = {{-80, 70}, {-80, -90}, {60, -40}, {60, 20}, {-80, 70}}), Text(origin = {24, -78}, extent = {{-36, 6}, {42, -14}}, textString = "%name"), Text(origin = {-18, -1}, extent = {{-40, 13}, {40, -13}}, textString = "Nzl"), Rectangle(origin = {-94, 100}, fillColor = {112, 112, 112}, fillPattern = FillPattern.Solid, extent = {{-6, 2}, {18, -2}}), Rectangle(origin = {-74, 110}, fillColor = {112, 112, 112}, fillPattern = FillPattern.Solid, extent = {{-6, -8}, {-2, -32}}),  Text(origin = {82, 85}, extent = {{-16, 11}, {8, 1}}, textString = "*static"), Line(origin = {81.88, 38.32}, points = {{-19, -10}, {17, -10}, {17, 60}}, pattern = LinePattern.Dot, thickness = 1)}, coordinateSystem(initialScale = 0.1)));
+
+end Nozzle;

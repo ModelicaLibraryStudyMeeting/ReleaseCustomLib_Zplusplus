@@ -1,0 +1,84 @@
+within PropulsionSystem.Elements;
+
+model PressureDrop_Wc2
+  extends PropulsionSystem.BaseClasses.PartialElementTwoPorts;
+  
+  /********************************************************
+    Declaration
+  ********************************************************/
+  //********** Package **********
+  //##### None #####
+  
+  
+  //********** Parameters **********
+  parameter Real dPqPdes= 0.05 
+    annotation(
+    Dialog(group = "Characteristics"));
+  parameter Modelica.SIunits.MassFlowRate Wdes=1.0
+    annotation(
+    Dialog(group = "Characteristics"));
+  parameter Modelica.SIunits.Pressure Pdes= 101.315*1000
+    annotation(
+    Dialog(group = "Characteristics"));
+  parameter Modelica.SIunits.Temperature Tdes= 288.15
+    annotation(
+    Dialog(group = "Characteristics"));
+
+  parameter Modelica.SIunits.Pressure Pstd= 101.315*1000;
+  parameter Modelica.SIunits.Temperature Tstd= 288.15;
+  
+  
+  //********** Internal variables **********
+  Real dPqP(start= dPqPdes);
+  Modelica.SIunits.MassFlowRate Wc(start= 1.0);
+  Modelica.SIunits.MassFlowRate WcDes(start= Wdes*sqrt(Tdes/Tstd)/(Pdes/Pstd));
+  Modelica.SIunits.PressureDifference dP(start = 1.0);
+  
+  
+  //********** Interfaces **********
+  //##### None #####
+  
+  
+  //********** Initialization **********
+  //##### None #####
+  
+  
+//********** Protected objects **********
+//##### None #####
+
+  
+/********************************************************
+  Model coding
+********************************************************/
+equation
+  //********** Geometries **********
+  //##### None #####
+  
+  
+  //********** Connections, interface <-> internal variables **********
+  //##### None #####
+  
+  
+  //********** Eqns describing physics **********
+  WcDes= Wdes*sqrt(Tdes/Tstd)/(Pdes/Pstd);
+  Wc= abs(port_a.m_flow)*sqrt(fluid_I.T/Tstd)/(fluid_I.p/Pstd);
+  dPqP= dPqPdes*(Wc/WcDes)^(2.0);
+  dP= dPqP* fluid_I.p;
+  fluid_O.p = fluid_I.p - dP;
+  
+  //-- mass conservation --
+  port_a.m_flow + port_b.m_flow= 0;
+  fluid_O.Xi= fluid_I.Xi;
+  
+  //-- energy conservation --
+  (port_a.m_flow*fluid_I.h) + (port_b.m_flow*fluid_O.h)=0;
+  
+  
+/********************************************************
+  Graphics
+********************************************************/
+
+annotation(
+    Icon(graphics = {Text(origin = {-6, -64}, extent = {{-66, 10}, {84, -20}}, textString = "%name"), Rectangle(origin = {0, -6}, fillColor = {211, 211, 211}, fillPattern = FillPattern.Solid, extent = {{-100, 46}, {100, -34}}), Rectangle(origin = {-98, 62}, fillColor = {147, 147, 147}, fillPattern = FillPattern.Solid, extent = {{-2, 34}, {2, -22}}), Rectangle(origin = {98, 62}, fillColor = {147, 147, 147}, fillPattern = FillPattern.Solid, extent = {{-2, 34}, {2, -22}}), Line(origin = {-87.3401, -33.9413}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-72.8584, -33.8651}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-58.6968, -34.4291}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-43.5748, -34.0328}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-28.4528, -33.9566}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-13.9711, -34.2005}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {0.83073, -33.8042}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {15.6326, -33.728}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {30.7546, -33.6518}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {44.9162, -33.8957}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {59.0778, -33.4994}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {73.5595, -33.7433}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {87.8805, -33.6701}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Text(origin = {5, 5}, extent = {{-45, 19}, {35, -11}}, textString = "dPqP")}, coordinateSystem(initialScale = 0.1)));
+
+end PressureDrop_Wc2;

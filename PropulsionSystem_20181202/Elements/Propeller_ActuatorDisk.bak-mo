@@ -1,0 +1,26 @@
+within PropulsionSystem.Elements;
+
+model Propeller_ActuatorDisk
+  
+  //----- Interfaces -----
+  Modelica.Mechanics.Rotational.Interfaces.Flange_b ShaftPort annotation(
+    Placement(visible = true, transformation(origin = {100, 0}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {98, 1.11022e-16}, extent = {{-4, -4}, {4, 4}}, rotation = 0)));
+  
+  Modelica.Mechanics.Translational.Interfaces.Flange_a ThrustPort annotation(
+    Placement(visible = true, transformation(origin = {60, -30}, extent = {{-10, -10}, {10, 10}}, rotation = 0), iconTransformation(origin = {73, -33}, extent = {{-5, -5}, {5, 5}}, rotation = 0)));
+  
+  
+equation
+  //********** Equations **********
+  //----- interface <-> internal properties -----
+  
+  //----- eqns describing physics -----
+  
+  //----- Internal Connections -----
+  /* none */
+  
+//********** Graphics **********
+  annotation(
+    Icon(graphics = {Rectangle(origin = {1, 0}, fillPattern = FillPattern.Solid, extent = {{-1, 2}, {97, -2}}), Polygon(origin = {-14, 0}, fillPattern = FillPattern.Solid, points = {{-18, 0}, {10, 14}, {10, -14}, {-18, 0}}), Text(origin = {11, -120}, extent = {{-55, 16}, {55, -16}}, textString = "%name"), Text(origin = {86, -46}, extent = {{-26, 6}, {20, 0}}, textString = "ThrustPort"), Line(origin = {49.5111, -18.9228}, points = {{-37.5031, 18.9478}, {-17.5031, -15.0522}, {24.4969, -15.0522}, {16.4969, -15.0522}}), Text(origin = {107, 9}, extent = {{-23, 5}, {11, -1}}, textString = "ShaftPort"),  Polygon(origin = {10, 44}, fillColor = {0, 0, 127}, fillPattern = FillPattern.Solid, points = {{-12, -44}, {-8, 50}, {2, 56}, {10, -44}, {-12, -44}}), Polygon(origin = {6, -44}, rotation = 180, fillColor = {0, 0, 127}, fillPattern = FillPattern.Solid, points = {{-12, -44}, {-8, 50}, {2, 56}, {8, -44}, {-12, -44}}), Ellipse(origin = {9, 0}, extent = {{-47, 100}, {43, -100}}, endAngle = 360), Rectangle(origin = {5, 1}, fillPattern = FillPattern.Solid, extent = {{-9, 13}, {15, -15}})}, coordinateSystem(initialScale = 0.1)));
+
+end Propeller_ActuatorDisk;

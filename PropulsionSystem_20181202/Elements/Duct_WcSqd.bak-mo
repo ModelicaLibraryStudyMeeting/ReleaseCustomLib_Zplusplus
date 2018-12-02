@@ -1,0 +1,62 @@
+within PropulsionSystem.Elements;
+
+model Duct_WcSqd
+  extends PropulsionSystem.Elements.Duct;
+  import Modelica.Constants;
+  
+  /********************************************************
+   Declaration
+  ********************************************************/
+  //********** Package **********
+  //##### none #####
+  
+  //********** Parameters **********
+  //inner parameter switchParameter_dPqP switch_dPqP;
+  
+  inner parameter Real k_dPqP= 0.0001
+    ""
+    annotation(
+    Dialog(group = "Characteristics"));
+  
+  
+  //********** Internal variables **********
+  inner Modelica.SIunits.MassFlowRate dm;
+  
+  
+  //********** Internal model **********
+  redeclare model Model_dPqP= PropulsionSystem.Subelement.dPqP_WcSqd;
+  
+   
+  PropulsionSystem.Elements.Duct_WcSqd.Model_dPqP model_dPqP(redeclare package Medium = Medium)
+    ""
+    annotation(
+    Placement(visible = true, transformation(origin = {-36, 42}, extent = {{-30, -30}, {30, 30}}, rotation = 0)));
+
+  
+  //********** Interfaces **********
+  //##### none #####
+  //********** Initialization **********
+  //##### none #####
+  //********** Protected objects **********
+  //##### none #####
+  
+equation
+  //********** Geometries **********
+  //##### none #####
+  
+  //********** Connections, interface <-> internal variables **********
+  dm= port_a.m_flow;
+  dPqP= model_dPqP.dPqP_internal;
+  
+  //********** Eqns describing physics **********
+  //##### none #####
+  
+  
+/********************************************************
+  Graphics
+********************************************************/
+  
+annotation(
+    Icon(graphics = {Text(origin = {-4, -60}, extent = {{-66, 10}, {84, -20}}, textString = "%name"), Rectangle(origin = {0, -6}, fillColor = {211, 211, 211}, fillPattern = FillPattern.Solid, extent = {{-100, 46}, {100, -34}}), Rectangle(origin = {-98, 62}, fillColor = {147, 147, 147}, fillPattern = FillPattern.Solid, extent = {{-2, 34}, {2, -22}}), Rectangle(origin = {98, 62}, fillColor = {147, 147, 147}, fillPattern = FillPattern.Solid, extent = {{-2, 34}, {2, -22}}), Line(origin = {-87.3401, -33.9413}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-72.8584, -33.8651}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-58.6968, -34.4291}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-43.5748, -34.0328}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-28.4528, -33.9566}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {-13.9711, -34.2005}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {0.83073, -33.8042}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {15.6326, -33.728}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {30.7546, -33.6518}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {44.9162, -33.8957}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {59.0778, -33.4994}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {73.5595, -33.7433}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Line(origin = {87.8805, -33.6701}, points = {{-6.97745, -5.58397}, {1.02255, 6.41603}, {7.02255, -5.58397}}, thickness = 1), Text(origin = {5, 5}, extent = {{-45, 19}, {35, -11}}, textString = "dPqP")}, coordinateSystem(initialScale = 0.1)));
+  
+end Duct_WcSqd;

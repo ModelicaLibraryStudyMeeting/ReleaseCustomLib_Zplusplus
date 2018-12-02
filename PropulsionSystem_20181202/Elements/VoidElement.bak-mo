@@ -1,0 +1,30 @@
+within PropulsionSystem.Elements;
+
+model VoidElement
+  extends PropulsionSystem.BaseClasses.PartialElementTwoPorts;
+  
+  //********** package **********
+  //********** design parameters **********
+  //********** internal variables **********
+  Real kLoss(start = 0.10);
+  Modelica.SIunits.PressureDifference dP(start = 1.0);
+  //********** interfaces **********
+
+equation
+  //********** interface <-> internal variables **********
+  //********** eqns describing physics **********
+  /**********
+  following eqns are written in base class
+    mass conservation
+    energy conservation
+  ***********/
+  kLoss = 0.01;
+  dP = kLoss * (1 / 2) * gas_I.d * V_I ^ 2;
+  gas_O.p = gas_I.p - dP;
+
+
+//********** graphics **********
+  annotation(
+    Icon(graphics = {Rectangle(origin = {4, 32}, fillColor = {191, 191, 191}, fillPattern = FillPattern.Solid, extent = {{-84, 30}, {76, -82}}), Text(origin = {7, -80}, extent = {{33, -24}, {-41, 30}}, textString = "%name"), Rectangle(origin = {-85, 98}, fillColor = {117, 117, 117}, fillPattern = FillPattern.Solid, extent = {{-13, 2}, {5, -2}}), Rectangle(origin = {95, 98}, fillColor = {117, 117, 117}, fillPattern = FillPattern.Solid, extent = {{-15, 2}, {5, -2}}), Rectangle(origin = {-78, 87}, rotation = -90, fillColor = {117, 117, 117}, fillPattern = FillPattern.Solid, extent = {{-13, 2}, {25, -2}}), Rectangle(origin = {78, 87}, rotation = -90, fillColor = {117, 117, 117}, fillPattern = FillPattern.Solid, extent = {{-13, 2}, {25, -2}}), Text(origin = {-4, 10}, extent = {{-30, 12}, {30, -12}}, textString = "void")}, coordinateSystem(initialScale = 0.1)));
+
+end VoidElement;
