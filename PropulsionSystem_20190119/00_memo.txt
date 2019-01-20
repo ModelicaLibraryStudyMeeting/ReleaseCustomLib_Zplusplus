@@ -1,0 +1,58 @@
+----------
+Author: Tomonobu Aozasa
+Date: 2018/08/19
+
+-. change; inStream -> actualStream 
+-. write "elliticCureves" on excel
+
+
+----------
+Author: Tomonobu Aozasa
+Date: 2018/06/11
+
+PartialElementTwoPorts
+	class type
+		model, partial
+		
+	extended from
+		none
+		
+	physics described
+		mass conservation
+		energy conservation
+		velocity calculation: inlet, outlet
+	
+	problem encountering
+		NONE
+	
+
+Compressor
+	class type
+		model
+		
+	extended from
+		PartialElementTwoPorts
+		
+	*problem encountering
+		conflict of equation, energy conservation is already coded in base-class
+
+
+PressureDrop_Wc2
+	class type
+		model
+		
+	extended from
+		PartialElementTwoPorts
+		
+	physics described
+		pressure drop, as function of corrected mass flow at port a
+		
+	*problem encountering
+		default unit of pressure is set "bar", not "Pa"
+	
+	*thing to be achieved, but postponed to another ver. or extension
+		pressure drop calclation of inverse flow
+		obtain dPqP via signal interface, "socket"
+
+----------
+
