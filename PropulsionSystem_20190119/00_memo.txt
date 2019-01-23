@@ -1,58 +1,10 @@
 ----------
 Author: Tomonobu Aozasa
-Date: 2018/08/19
-
--. change; inStream -> actualStream 
--. write "elliticCureves" on excel
-
-
+Date: 2019/01/19
+	質量遅れの再現を試みようと、MSL、FluidのClosedVolumeコンポーネントをタービン下流に１つ入れて計算を回したところ、コンパイルまでは成功するが、計算を開始すると"Matrix singlar"が手続けて1秒も計算結果を得られずにFailする。
+	インプット（燃料流量）変化は計算開始後10sのタイミングで与えており、ClosedVolumeの効果が発現するのは10s以降。計算がFailして結果が得られない事象は0sで既に起きているので、設定値が変で物理的に解が無い問題を解こうとしてしまっている可能性は小さい。もしControlVolumeが解無し問題を生じさせているなら、過渡応答が始まる10s以降のタイミングで計算がFailする筈。
+	
+	モデル（ExampleのEngine内に保存）
+		●TurboJet001_005：ClosedVolumeを入れる前の無事に過渡計算が回るモデル。過渡応答を生むコンポーネントはシャフトのInertiaのみ。
+		●TurboJet001_006：_005のタービン下流にClosedVolumeを挿入したモデル。インプット（燃料流量）含め、他に_005との差異は無い。
 ----------
-Author: Tomonobu Aozasa
-Date: 2018/06/11
-
-PartialElementTwoPorts
-	class type
-		model, partial
-		
-	extended from
-		none
-		
-	physics described
-		mass conservation
-		energy conservation
-		velocity calculation: inlet, outlet
-	
-	problem encountering
-		NONE
-	
-
-Compressor
-	class type
-		model
-		
-	extended from
-		PartialElementTwoPorts
-		
-	*problem encountering
-		conflict of equation, energy conservation is already coded in base-class
-
-
-PressureDrop_Wc2
-	class type
-		model
-		
-	extended from
-		PartialElementTwoPorts
-		
-	physics described
-		pressure drop, as function of corrected mass flow at port a
-		
-	*problem encountering
-		default unit of pressure is set "bar", not "Pa"
-	
-	*thing to be achieved, but postponed to another ver. or extension
-		pressure drop calclation of inverse flow
-		obtain dPqP via signal interface, "socket"
-
-----------
-
